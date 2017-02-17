@@ -10,7 +10,7 @@ import java.util.Scanner;
  */
 public class RechercheLocal {
 
-	public static Solution start(Solution sol,ArrayList<Integer> permut){
+	public static Solution start(Solution sol,ArrayList<Integer> permut,ArrayList<ArrayList<Integer>> tabou){
 		Solution res = sol;
 		ArrayList<Integer> pRes = null;
 		boolean isFin = true;
@@ -20,7 +20,7 @@ public class RechercheLocal {
 					ArrayList<Integer> pTmp = (ArrayList) RechercheLocal.Permutation(permut, i,j);
 					Solution solTmp = Greedy.stupidGreedy(res.getInstance(), pTmp);
 
-					if (res.getDelay() > solTmp.getDelay()) {
+					if (res.getDelay() > solTmp.getDelay() && (!tabou.contains(pTmp))) {
 						res = solTmp;
 						pRes=pTmp;
 						isFin = false;
@@ -28,20 +28,41 @@ public class RechercheLocal {
 				}
 			}
 			if(isFin == false) {
-				res = start(res, pRes);
+				tabou.add(pRes);
+				System.out.println(tabou);
+				System.out.println();
+				System.out.println();
+				System.out.println();
+				res = start(res, pRes,tabou);
+			}else{
+				boolean ok = false;
+				for(int i=0;i<permut.size() && ok == false;i++) {
+					for (int j = 0; j < permut.size() && ok == false; j++) {
+						if(!tabou.contains(RechercheLocal.Permutation(permut,i,j))){
+							ok = true;
+							pRes = (ArrayList<Integer>) RechercheLocal.Permutation(permut,i,j);
+						}
+					}
+				}
+				if(ok) {
+					tabou.add(pRes);
+					System.out.println(tabou);
+					System.out.println();
+					System.out.println();
+					System.out.println();
+					res = start(sol, pRes, tabou);
+				}
 			}
 		}
 		return res;
 	}
 
 	public static List<Integer> Permutation(ArrayList<Integer> permut,int i,int j){
-		// On cherche a permuté les indice a et b
-		int indice1 = i;
-		int indice2 = j;
+		// On cherche a permuté les indice i et j
 
-		int val1 = permut.get(indice1);
-		int val2 = permut.get(indice2);
-		permut.set(indice1,val2);permut.set(indice2,val1);
+		int val1 = permut.get(i);
+		int val2 = permut.get(j);
+		permut.set(i,val2);permut.set(j,val1);
 		return permut;
 	}
 
@@ -72,7 +93,7 @@ public class RechercheLocal {
 		Collections.shuffle(permutation);
 		Solution solution = Greedy.stupidGreedy(instance, permutation);
 
-		return start(solution,permutation);
+		return start(solution,permutation,new ArrayList<ArrayList<Integer>>());
 	}
 
 	public static ArrayList<Integer> triPermutation(ArrayList<Integer> permut,Instance inst){
