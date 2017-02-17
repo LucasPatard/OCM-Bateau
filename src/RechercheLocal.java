@@ -12,31 +12,32 @@ public class RechercheLocal {
 
 	public static Solution start(Solution sol,ArrayList<Integer> permut){
 		Solution res = sol;
-		int indiceVoisin = 0;
+		ArrayList<Integer> pRes = null;
 		boolean isFin = true;
 		if(sol.getDelay() > 0) {
-			for(int i=0;i<permut.size()-1;i++){
-				ArrayList<Integer> pTmp = (ArrayList) RechercheLocal.lastPermutation(permut,i);
-				Solution solTmp = Greedy.stupidGreedy(res.getInstance(),pTmp);
+			for(int i=0;i<permut.size();i++){
+				for(int j=0;j<permut.size();j++) {
+					ArrayList<Integer> pTmp = (ArrayList) RechercheLocal.Permutation(permut, i,j);
+					Solution solTmp = Greedy.stupidGreedy(res.getInstance(), pTmp);
 
-				if(res.getDelay() > solTmp.getDelay()){
-					res = solTmp;
-					indiceVoisin = i;
-					isFin = false;
+					if (res.getDelay() > solTmp.getDelay()) {
+						res = solTmp;
+						pRes=pTmp;
+						isFin = false;
+					}
 				}
 			}
 			if(isFin == false) {
-				res = start(res, (ArrayList) RechercheLocal.lastPermutation(permut, indiceVoisin));
+				res = start(res, pRes);
 			}
 		}
-
 		return res;
 	}
 
-	public static List<Integer> lastPermutation(ArrayList<Integer> permut,int nb){
+	public static List<Integer> Permutation(ArrayList<Integer> permut,int i,int j){
 		// On cherche a permuté les indice a et b
-		int indice1 = nb;
-		int indice2 =(int) (permut.size()-1);
+		int indice1 = i;
+		int indice2 = j;
 
 		int val1 = permut.get(indice1);
 		int val2 = permut.get(indice2);
@@ -45,7 +46,7 @@ public class RechercheLocal {
 	}
 
 	public static void main(String[] args) {
-		String instancePath = "i004_007B";
+		String instancePath = "i010_050";
 		Scanner scInst = null;
 		try {
 			scInst = new Scanner(new File(instancePath));
@@ -71,7 +72,7 @@ public class RechercheLocal {
 		Collections.shuffle(permutation);
 		Solution solution = Greedy.stupidGreedy(instance, permutation);
 
-		return start(solution,RechercheLocal.triPermutation(permutation,instance));
+		return start(solution,permutation);
 	}
 
 	public static ArrayList<Integer> triPermutation(ArrayList<Integer> permut,Instance inst){
