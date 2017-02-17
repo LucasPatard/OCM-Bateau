@@ -46,7 +46,7 @@ public class RechercheLocal {
 	}
 
 	public static void main(String[] args) {
-		String instancePath = "i010_050";
+		String instancePath = "i020_100";
 		Scanner scInst = null;
 		try {
 			scInst = new Scanner(new File(instancePath));
@@ -72,7 +72,7 @@ public class RechercheLocal {
 		Collections.shuffle(permutation);
 		Solution solution = Greedy.stupidGreedy(instance, permutation);
 
-		return start(solution,permutation);
+		return start(solution,triPermutation(permutation,instance));
 	}
 
 	public static ArrayList<Integer> triPermutation(ArrayList<Integer> permut,Instance inst){
