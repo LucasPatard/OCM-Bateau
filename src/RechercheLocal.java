@@ -11,25 +11,31 @@ import java.util.Scanner;
 public class RechercheLocal {
 
 	public static Solution start(Solution sol,ArrayList<Integer> permut){
-		int nbVoisins = (int)(permut.size()*1.5);
 		Solution res = sol;
+		int indiceVoisin = 0;
+		boolean isFin = true;
 		if(sol.getDelay() > 0) {
-			for(int i=0;i<nbVoisins;i++){
-				ArrayList<Integer> pTmp = (ArrayList) RechercheLocal.lastPermutation(permut);
+			for(int i=0;i<permut.size()-1;i++){
+				ArrayList<Integer> pTmp = (ArrayList) RechercheLocal.lastPermutation(permut,i);
 				Solution solTmp = Greedy.stupidGreedy(res.getInstance(),pTmp);
 
 				if(res.getDelay() > solTmp.getDelay()){
-					res = start(solTmp,pTmp);
+					res = solTmp;
+					indiceVoisin = i;
+					isFin = false;
 				}
 			}
-
+			if(isFin == false) {
+				res = start(res, (ArrayList) RechercheLocal.lastPermutation(permut, indiceVoisin));
+			}
 		}
+
 		return res;
 	}
 
-	public static List<Integer> lastPermutation(ArrayList<Integer> permut){
+	public static List<Integer> lastPermutation(ArrayList<Integer> permut,int nb){
 		// On cherche a permuté les indice a et b
-		int indice1 =(int) (Math.random()*permut.size()-1);
+		int indice1 = nb;
 		int indice2 =(int) (permut.size()-1);
 
 		int val1 = permut.get(indice1);
@@ -49,14 +55,27 @@ public class RechercheLocal {
 		}
 		Instance instance = new Instance(scInst);
 
+
+		long t = System.currentTimeMillis();
+		Solution solution = RechercheLocal.start(instance);
+		System.out.println(System.currentTimeMillis()-t);
+		solution.draw();
+		System.out.println(solution.getDelay());
+	}
+
+	public static Solution start(Instance instance){
 		ArrayList<Integer> permutation = new ArrayList<Integer>(
 				instance.getShipCount());
 		for (int i = 0; i < instance.getShipCount(); i++)
 			permutation.add(i);
 		Collections.shuffle(permutation);
-
 		Solution solution = Greedy.stupidGreedy(instance, permutation);
-		solution = RechercheLocal.start(solution,permutation);
-		solution.draw();
+
+		return start(solution,RechercheLocal.triPermutation(permutation,instance));
+	}
+
+	public static ArrayList<Integer> triPermutation(ArrayList<Integer> permut,Instance inst){
+		permut.sort((o1,o2) -> inst.getShip(o1).getArrivalTime() - inst.getShip(o2).getArrivalTime());
+		return permut;
 	}
 }
