@@ -45,7 +45,7 @@ public class RechercheLocal {
 	}
 
 	public static void main(String[] args) {
-		String instancePath = "i020_100";
+		String instancePath = "i004_007B";
 		Scanner scInst = null;
 		try {
 			scInst = new Scanner(new File(instancePath));
@@ -55,15 +55,27 @@ public class RechercheLocal {
 		}
 		Instance instance = new Instance(scInst);
 
+
+		long t = System.currentTimeMillis();
+		Solution solution = RechercheLocal.start(instance);
+		System.out.println(System.currentTimeMillis()-t);
+		solution.draw();
+		System.out.println(solution.getDelay());
+	}
+
+	public static Solution start(Instance instance){
 		ArrayList<Integer> permutation = new ArrayList<Integer>(
 				instance.getShipCount());
 		for (int i = 0; i < instance.getShipCount(); i++)
 			permutation.add(i);
 		Collections.shuffle(permutation);
-
 		Solution solution = Greedy.stupidGreedy(instance, permutation);
-		solution = RechercheLocal.start(solution,permutation);
-		solution.draw();
-		System.out.println(solution.getDelay());
+
+		return start(solution,RechercheLocal.triPermutation(permutation,instance));
+	}
+
+	public static ArrayList<Integer> triPermutation(ArrayList<Integer> permut,Instance inst){
+		permut.sort((o1,o2) -> inst.getShip(o1).getArrivalTime() - inst.getShip(o2).getArrivalTime());
+		return permut;
 	}
 }
